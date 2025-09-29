@@ -25,30 +25,67 @@ class ExecutionStepRequest(BaseModel):
     stepNumber: int
 
 
-@router.post("/analyze-ds", response_model=DSAnalysisResponse)
+@router.post("/analyze-ds")
 async def analyze_data_structures(request: DSAnalysisRequest):
     """
-    Analyze Python code for data structure usage and operations
+    🚀 Real-time analysis of Python code for data structures and variables
     """
     try:
-        analyzer = DataStructureAnalyzer()
-        analysis = analyzer.analyze_code(request.code)
-
-        result = DSAnalysisResponse(
-            dsState=analysis["initialState"],
-            operations=analysis["operations"],
-            totalSteps=len(analysis["operations"]),
-        )
-
-        # If tracing is enabled, also run execution simulation
-        if request.enableTracing:
-            tracer = ExecutionTracer()
-            execution_result = tracer.trace_execution(request.code)
-
-            result.executionTimeline = execution_result["executionTimeline"]
-            result.totalSteps = execution_result["totalSteps"]
-
-        return result
+        # Execute code safely and extract variables
+        local_vars = {}
+        global_vars = {}
+        call_stack = []
+        
+        try:
+            # Create safe execution environment
+            safe_globals = {
+                '__builtins__': {
+                    'len': len, 'range': range, 'enumerate': enumerate,
+                    'print': lambda *args: None,  # Silent print for analysis
+                    'list': list, 'dict': dict, 'set': set, 'tuple': tuple,
+                    'str': str, 'int': int, 'float': float, 'bool': bool,
+                }
+            }
+            
+            # Execute code and capture variables
+            exec(request.code, safe_globals, local_vars)
+            
+            # Filter out built-in variables and functions
+            variables = {}
+            for name, value in local_vars.items():
+                if not name.startswith('__') and not callable(value):
+                    # Convert complex objects to serializable format
+                    if isinstance(value, (list, tuple)):
+                        variables[name] = list(value)
+                    elif isinstance(value, dict):
+                        variables[name] = dict(value)
+                    elif isinstance(value, set):
+                        variables[name] = list(value)
+                    else:
+                        variables[name] = value
+            
+            # Generate call stack info
+            call_stack = [{"function": "main", "line": 1}]
+            
+            return {
+                "variables": variables,
+                "call_stack": call_stack,
+                "success": True,
+                "error": None
+            }
+            
+        except Exception as exec_error:
+            # If execution fails, try static analysis
+            analyzer = DataStructureAnalyzer()
+            analysis = analyzer.analyze_code(request.code)
+            
+            return {
+                "variables": {},
+                "call_stack": [{"function": "main", "line": 1}],
+                "success": False,
+                "error": str(exec_error),
+                "static_analysis": analysis
+            }
 
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"DS analysis error: {str(e)}")

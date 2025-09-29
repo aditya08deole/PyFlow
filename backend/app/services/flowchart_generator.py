@@ -277,13 +277,13 @@ class FlowchartGenerator:
             return generic_node
 
     def generate_mermaid(self) -> str:
-        """Generate Mermaid.js flowchart syntax"""
+        """Generate Mermaid.js flowchart syntax with proper escaping"""
         lines = ["flowchart TD"]
 
-        # Add node definitions
+        # Add node definitions with proper escaping
         for node_id, node_data in self.nodes.items():
             node_type = node_data["type"]
-            label = node_data["label"]
+            label = self._escape_mermaid_text(node_data["label"])
 
             if node_type == "start":
                 lines.append(f"    {node_id}([{label}])")
@@ -294,11 +294,29 @@ class FlowchartGenerator:
             else:  # process
                 lines.append(f"    {node_id}[{label}]")
 
-        # Add edges
+        # Add edges with proper escaping
         for edge in self.edges:
             if edge["label"]:
-                lines.append(f"    {edge['from']} -->|{edge['label']}| {edge['to']}")
+                escaped_label = self._escape_mermaid_text(edge["label"])
+                lines.append(f"    {edge['from']} -->|{escaped_label}| {edge['to']}")
             else:
                 lines.append(f"    {edge['from']} --> {edge['to']}")
 
         return "\n".join(lines)
+    
+    def _escape_mermaid_text(self, text: str) -> str:
+        """Escape special characters for Mermaid.js compatibility"""
+        # Remove or replace problematic characters
+        text = text.replace("[", "(").replace("]", ")")
+        text = text.replace("{", "(").replace("}", ")")
+        text = text.replace("|", " or ")
+        text = text.replace("&", "and")
+        text = text.replace("<", "lt").replace(">", "gt")
+        text = text.replace("'", "").replace('"', "")
+        text = text.replace("()", "")  # Remove empty parentheses
+        
+        # Limit length to prevent parsing issues
+        if len(text) > 50:
+            text = text[:47] + "..."
+            
+        return text

@@ -6,7 +6,15 @@ import VariablePanel from '../components/VariablePanel';
 import AIAssistant from '../components/AIAssistant';
 
 interface PerformanceMetrics {
-  executionTime: number;
+  executionTime: number;        <div className="w-1/2 relative">
+          {isAnalyzing && (
+            <div className="absolute top-2 right-2 z-10">
+              <div className="flex items-center gap-2 bg-blue-50 text-blue-600 px-3 py-1 rounded-full text-sm">
+                <div className="animate-spin w-3 h-3 border border-blue-300 border-t-blue-600 rounded-full"></div>
+                Analyzing...
+              </div>
+            </div>
+          )}
   memoryUsage: number;
   complexity: string;
   operations: number;
@@ -24,21 +32,9 @@ interface CodeInsights {
 }
 
 const EnhancedCodeEditor: React.FC = () => {
-  const [code, setCode] = useState(`# Welcome to PyFlow Enhanced!
-def factorial(n):
-    \"\"\"Calculate factorial using recursion\"\"\"
-    if n <= 1:
-        return 1
-    return n * factorial(n - 1)
+  const [code, setCode] = useState(`# 🚀 Welcome to PyFlow - Real-Time Code Visualizer!
+# Start typing your Python code below to see live flowcharts...
 
-# Test the function
-result = factorial(5)
-print(f"Factorial of 5 is: {result}")
-
-# Array example for data structure visualization
-numbers = [1, 2, 3, 4, 5]
-for i, num in enumerate(numbers):
-    print(f"Index {i}: {num}")
 `);
 
   const [flowchartData, setFlowchartData] = useState('');
@@ -46,6 +42,15 @@ for i, num in enumerate(numbers):
   const [isDebugging, setIsDebugging] = useState(false);
   const [variables, setVariables] = useState<Record<string, unknown>>({});
   const [performanceMetrics, setPerformanceMetrics] = useState<PerformanceMetrics | null>(null);
+  const [isAnalyzing, setIsAnalyzing] = useState(false);
+  const [analysisDelay, setAnalysisDelay] = useState<NodeJS.Timeout | null>(null);
+  const [dsState, setDsState] = useState<{
+    arrays: Array<{ name: string; values: unknown[]; highlightIndex?: number }>;
+  } | null>(null);
+  const [memoryState, setMemoryState] = useState<{
+    stack: Array<{ function: string; line: number }>;
+    heap: Array<{ type: string; value: string; id: string }>;
+  } | null>(null);
   const [collaborationState, setCollaborationState] = useState<CollaborationState>({
     users: [],
     isLive: false
@@ -53,42 +58,13 @@ for i, num in enumerate(numbers):
   const [codeInsights, setCodeInsights] = useState<CodeInsights | null>(null);
   const [wsConnection, setWsConnection] = useState<WebSocket | null>(null);
 
-  // Enhanced data structure state with animations
-  const [dsState] = useState({
-    arrays: [
-      { 
-        name: 'numbers', 
-        values: [1, 2, 3, 4, 5], 
-        highlightIndex: currentLine ? (currentLine % 5) : undefined 
-      },
-      { 
-        name: 'result', 
-        values: ['calculating...'], 
-        highlightIndex: undefined 
-      }
-    ]
-  });
-
-  // Enhanced memory state
-  const [memoryState] = useState({
-    stack: [
-      { function: 'main', line: 1 },
-      { function: 'factorial', line: currentLine || 1 }
-    ],
-    heap: [
-      { type: 'int', value: '5', id: '0x001' },
-      { type: 'list', value: '[1,2,3,4,5]', id: '0x002' },
-      { type: 'str', value: 'Factorial of 5 is: 120', id: '0x003' }
-    ]
-  });
-
   // WebSocket connection for real-time collaboration
   useEffect(() => {
     const connectWebSocket = () => {
       const ws = new WebSocket('ws://localhost:8000/api/ws/');
       
       ws.onopen = () => {
-        console.log('Connected to collaboration server');
+        // Connected to collaboration server
         setCollaborationState(prev => ({ ...prev, isLive: true }));
       };
       
@@ -104,7 +80,7 @@ for i, num in enumerate(numbers):
             break;
           case 'cursor_update':
             // Handle other users' cursor updates
-            console.log('User cursor update:', message);
+            // User cursor update received
             break;
           case 'code_update':
             // Handle real-time code changes
@@ -120,7 +96,7 @@ for i, num in enumerate(numbers):
       };
       
       ws.onclose = () => {
-        console.log('Disconnected from collaboration server');
+        // Disconnected from collaboration server
         setCollaborationState(prev => ({ ...prev, isLive: false, users: [] }));
         // Attempt to reconnect after 3 seconds
         setTimeout(connectWebSocket, 3000);
@@ -136,12 +112,22 @@ for i, num in enumerate(numbers):
         wsConnection.close();
       }
     };
-  }, []);
+  }, [wsConnection, code]);
 
-  // Enhanced code analysis
+  // 🚀 Real-time code analysis with debounced updates  
   const analyzeCode = useCallback(async () => {
+    if (!code.trim() || code.trim().startsWith('# 🚀 Welcome to PyFlow')) {
+      setFlowchartData('');
+      setDsState(null);
+      setMemoryState(null);
+      setPerformanceMetrics(null);
+      return;
+    }
+
+    setIsAnalyzing(true);
+
     try {
-      // Generate flowchart with enhanced metrics
+      // 🔄 Generate real-time flowchart
       const flowchartResponse = await fetch('http://localhost:8000/api/generate-flowchart', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -152,36 +138,97 @@ for i, num in enumerate(numbers):
         const flowchartResult = await flowchartResponse.json();
         setFlowchartData(flowchartResult.mermaid);
         
-        // Set performance metrics if available
+        // 📊 Real-time performance metrics
         if (flowchartResult.performance_metrics) {
           setPerformanceMetrics({
             executionTime: flowchartResult.performance_metrics.execution_time || 0,
-            memoryUsage: Math.floor(Math.random() * 50) + 10, // Mock memory usage
-            complexity: flowchartResult.performance_metrics.complexity || 'O(n)',
+            memoryUsage: flowchartResult.performance_metrics.memory_usage || 0,
+            complexity: flowchartResult.performance_metrics.complexity || 'O(1)',
             operations: flowchartResult.performance_metrics.operations || 0
           });
         }
       }
 
-      // Get AI insights
+      // 🏗️ Real-time data structure analysis
+      const dsResponse = await fetch('http://localhost:8000/api/analyze-ds', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ code }),
+      });
+
+      if (dsResponse.ok) {
+        const dsResult = await dsResponse.json();
+        if (dsResult.variables && Object.keys(dsResult.variables).length > 0) {
+          const arrays = Object.entries(dsResult.variables)
+            .filter(([_, value]) => Array.isArray(value))
+            .map(([name, value]) => ({
+              name,
+              values: value as unknown[],
+              highlightIndex: undefined
+            }));
+          
+          setDsState({ arrays });
+          setVariables(dsResult.variables);
+
+          // 🧠 Generate memory state visualization  
+          setMemoryState({
+            stack: dsResult.call_stack || [{ function: 'main', line: 1 }],
+            heap: Object.entries(dsResult.variables).map(([_, value], index) => ({
+              type: typeof value,
+              value: String(value).slice(0, 20),
+              id: `0x${(index + 1).toString(16).padStart(3, '0')}`
+            }))
+          });
+        }
+      }
+
+      // 🤖 Real-time AI insights
       const aiResponse = await fetch('http://localhost:8000/api/ai-suggestions', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ code, question: 'analyze code quality' }),
+        body: JSON.stringify({ code, question: 'analyze code quality and suggest improvements' }),
       });
 
       if (aiResponse.ok) {
         const aiResult = await aiResponse.json();
         setCodeInsights({
-          suggestions: aiResult.suggestions,
-          complexity: 'Medium',
-          patterns: aiResult.explanations
+          suggestions: aiResult.suggestions || [],
+          complexity: aiResult.complexity || 'Medium',
+          patterns: aiResult.patterns || []
         });
       }
     } catch (error) {
-      console.error('Error analyzing code:', error);
+      // Silent error handling for better UX
+    } finally {
+      setIsAnalyzing(false);
     }
   }, [code]);
+
+  // 🔄 Real-time debounced analysis trigger
+  const handleCodeChange = useCallback((newCode: string) => {
+    setCode(newCode);
+    
+    // Clear previous timeout
+    if (analysisDelay) {
+      clearTimeout(analysisDelay);
+    }
+    
+    // Set new timeout for debounced analysis (300ms delay)
+    const timeoutId = setTimeout(() => {
+      analyzeCode();
+    }, 300);
+    
+    setAnalysisDelay(timeoutId);
+    
+    // Broadcast code changes to collaborators
+    if (wsConnection && wsConnection.readyState === WebSocket.OPEN) {
+      wsConnection.send(JSON.stringify({
+        type: 'code_update',
+        code: newCode,
+        timestamp: Date.now()
+      }));
+    }
+  }, [analysisDelay, analyzeCode, wsConnection]);
 
   // Enhanced debugging functions
   const startDebugging = useCallback(() => {
@@ -265,13 +312,13 @@ for i, num in enumerate(numbers):
     analyzeCode();
   }, [analyzeCode]);
 
-  const handleNodeClick = useCallback((nodeId: string) => {
-    console.log('Node clicked:', nodeId);
+  const handleNodeClick = useCallback((_nodeId: string) => {
+    // Handle node click
     // You can implement node-specific actions here
   }, []);
 
   const handleAnimationComplete = useCallback(() => {
-    console.log('Animation completed');
+    // Animation completed
   }, []);
 
   return (
@@ -322,17 +369,6 @@ for i, num in enumerate(numbers):
             <MonacoEditor
               value={code}
               onChange={handleCodeChange}
-              options={{
-                minimap: { enabled: true },
-                fontSize: 14,
-                lineNumbers: 'on',
-                wordWrap: 'on',
-                automaticLayout: true,
-                scrollBeyondLastLine: false,
-                renderWhitespace: 'boundary',
-                suggestOnTriggerCharacters: true,
-                quickSuggestions: true,
-              }}
             />
           </div>
         </div>
@@ -346,9 +382,9 @@ for i, num in enumerate(numbers):
             <FlowchartViewer
               data={flowchartData}
               currentLine={currentLine}
-              dsState={dsState}
-              memoryState={memoryState}
-              performanceMetrics={performanceMetrics}
+              dsState={dsState || undefined}
+              memoryState={memoryState || undefined}
+              performanceMetrics={performanceMetrics || undefined}
               collaborationState={collaborationState}
               onNodeClick={handleNodeClick}
               onAnimationComplete={handleAnimationComplete}
@@ -367,7 +403,6 @@ for i, num in enumerate(numbers):
             onStop={stopDebugging}
             onStep={stepForward}
             currentLine={currentLine}
-            onCurrentLineChange={setCurrentLine}
           />
         </div>
 
@@ -381,8 +416,8 @@ for i, num in enumerate(numbers):
           <AIAssistant 
             code={code}
             insights={codeInsights}
-            onSuggestionApply={(suggestion) => {
-              console.log('Applying suggestion:', suggestion);
+            onSuggestionApply={(_suggestion) => {
+              // Apply suggestion
             }}
           />
         </div>

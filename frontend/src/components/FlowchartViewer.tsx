@@ -56,7 +56,7 @@ const FlowchartViewer: React.FC<FlowchartViewerProps> = ({
   const [isAnimating, setIsAnimating] = useState(false);
   const [highlightedNodes, setHighlightedNodes] = useState<Set<string>>(new Set());
   const mermaidRef = useRef<HTMLDivElement>(null);
-  const animationRef = useRef<number>();
+  const animationRef = useRef<NodeJS.Timeout | null>(null);
 
   // Initialize Mermaid with enhanced configuration
   useEffect(() => {
@@ -79,16 +79,27 @@ const FlowchartViewer: React.FC<FlowchartViewerProps> = ({
     });
   }, [theme]);
 
+    const getAnimationDuration = useCallback(() => {
+    switch (animationSpeed) {
+      case 'slow': return 1500;
+      case 'medium': return 800;
+      case 'fast': return 400;
+      case 'instant': return 0;
+      default: return 800;
+    }
+  }, [animationSpeed]);
+
   // Enhanced animation system
   const animateExecution = useCallback((line: number) => {
     if (!mermaidRef.current) return;
     
     setIsAnimating(true);
+    const duration = getAnimationDuration();
     const nodes = mermaidRef.current.querySelectorAll('[id^="node"]');
     
     nodes.forEach((node) => {
       const element = node as HTMLElement;
-      element.style.transition = `all ${getAnimationDuration()}ms ease-in-out`;
+      element.style.transition = `all ${duration}ms ease-in-out`;
       element.style.filter = 'brightness(0.7)';
     });
     
@@ -102,23 +113,30 @@ const FlowchartViewer: React.FC<FlowchartViewerProps> = ({
       currentNode.style.transform = 'scale(1.1)';
       currentNode.style.boxShadow = '0 4px 20px rgba(59, 130, 246, 0.5)';
       
-      setTimeout(() => {
+      // Store timeout reference for cleanup
+      const timeoutId = setTimeout(() => {
         currentNode.style.transform = 'scale(1)';
         setIsAnimating(false);
         onAnimationComplete?.();
-      }, getAnimationDuration());
+      }, duration);
+      
+      animationRef.current = timeoutId;
     }
-  }, [animationSpeed, onAnimationComplete]);
+  }, [onAnimationComplete, getAnimationDuration]);
 
-  const getAnimationDuration = () => {
-    switch (animationSpeed) {
-      case 'slow': return 1500;
-      case 'medium': return 800;
-      case 'fast': return 400;
-      case 'instant': return 0;
-      default: return 800;
+  // Use highlightedNodes for visual feedback
+  useEffect(() => {
+    if (mermaidRef.current && highlightedNodes.size > 0) {
+      const nodes = mermaidRef.current.querySelectorAll('[data-node-id]');
+      nodes.forEach((node) => {
+        const element = node as HTMLElement;
+        const nodeId = element.getAttribute('data-node-id');
+        if (nodeId && highlightedNodes.has(nodeId)) {
+          element.style.outline = '2px solid #3b82f6';
+        }
+      });
     }
-  };
+  }, [highlightedNodes]);
 
   // Enhanced node click handler
   const handleNodeClick = useCallback((event: MouseEvent) => {
@@ -126,7 +144,7 @@ const FlowchartViewer: React.FC<FlowchartViewerProps> = ({
     const nodeId = target.getAttribute('data-node-id');
     if (nodeId && onNodeClick) {
       onNodeClick(nodeId);
-      setHighlightedNodes(prev => new Set([...prev, nodeId]));
+      setHighlightedNodes(prev => new Set(Array.from(prev).concat(nodeId)));
     }
   }, [onNodeClick]);
 

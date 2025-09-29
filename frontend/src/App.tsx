@@ -2,7 +2,7 @@ import React from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import { Provider } from 'react-redux';
 import { store } from './store/store';
-import CodeEditor from './pages/CodeEditor';
+import RealTimeCodeEditor from './pages/RealTimeCodeEditor';
 import Dashboard from './pages/Dashboard';
 import Challenges from './pages/Challenges';
 import Navigation from './components/Navigation';
@@ -16,7 +16,7 @@ const App: React.FC = () => {
           <Navigation />
           <main className="pt-4">
             <Routes>
-              <Route path="/" element={<CodeEditor />} />
+              <Route path="/" element={<RealTimeCodeEditor />} />
               <Route path="/dashboard" element={<Dashboard />} />
               <Route path="/challenges" element={<Challenges />} />
             </Routes>
