@@ -49,33 +49,33 @@ print("Stack operations complete!")`);
   const [isDebugging, setIsDebugging] = useState(false);
   const [currentLine, setCurrentLine] = useState<number | null>(null);
   const [variables, setVariables] = useState<Record<string, unknown>>({});
-  
+
   // Sample data for visualization demo
   const [sampleDsState] = useState({
     arrays: [
       {
         name: 'my_array',
         values: [64, 34, 25, 12, 22, 11, 90],
-        highlightIndex: 1
+        highlightIndex: 1,
       },
       {
         name: 'stack',
         values: [10, 20, 30],
-        highlightIndex: 2
-      }
-    ]
+        highlightIndex: 2,
+      },
+    ],
   });
-  
+
   const [sampleMemoryState] = useState({
     stack: [
       { function: 'bubble_sort', line: 8 },
-      { function: 'main', line: 15 }
+      { function: 'main', line: 15 },
     ],
     heap: [
       { type: 'list', value: '[64, 34, 25, 12, 22, 11, 90]', id: '0x7f8b8c' },
       { type: 'int', value: '64', id: '0x7f8b90' },
-      { type: 'str', value: '"Original array:"', id: '0x7f8b94' }
-    ]
+      { type: 'str', value: '"Original array:"', id: '0x7f8b94' },
+    ],
   });
 
   // Generate flowchart when code changes
@@ -94,7 +94,7 @@ print("Stack operations complete!")`);
         },
         body: JSON.stringify({ code: pythonCode }),
       });
-      
+
       if (response.ok) {
         const data = await response.json();
         setFlowchartData(data.mermaid);
@@ -136,10 +136,7 @@ print("Stack operations complete!")`);
               <h2 className="text-lg font-semibold">Python Code Editor</h2>
             </div>
             <div className="flex-1">
-              <MonacoEditor
-                value={code}
-                onChange={setCode}
-              />
+              <MonacoEditor value={code} onChange={setCode} />
             </div>
           </div>
         </div>

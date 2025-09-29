@@ -4,7 +4,7 @@ const Dashboard: React.FC = () => {
   return (
     <div className="max-w-6xl mx-auto">
       <h1 className="text-3xl font-bold text-gray-800 mb-8">Learning Dashboard</h1>
-      
+
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
         {/* Stats Cards */}
         <div className="bg-white p-6 rounded-lg shadow">
@@ -12,20 +12,20 @@ const Dashboard: React.FC = () => {
           <p className="text-3xl font-bold text-blue-600">23</p>
           <p className="text-sm text-gray-500">This week</p>
         </div>
-        
+
         <div className="bg-white p-6 rounded-lg shadow">
           <h3 className="text-lg font-medium text-gray-900 mb-2">Challenges Completed</h3>
           <p className="text-3xl font-bold text-green-600">7</p>
           <p className="text-sm text-gray-500">Out of 15</p>
         </div>
-        
+
         <div className="bg-white p-6 rounded-lg shadow">
           <h3 className="text-lg font-medium text-gray-900 mb-2">Learning Streak</h3>
           <p className="text-3xl font-bold text-purple-600">5</p>
           <p className="text-sm text-gray-500">Days</p>
         </div>
       </div>
-      
+
       {/* Recent Activity */}
       <div className="bg-white rounded-lg shadow">
         <div className="p-6 border-b">

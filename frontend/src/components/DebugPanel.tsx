@@ -13,12 +13,12 @@ const DebugPanel: React.FC<DebugPanelProps> = ({
   onStart,
   onStop,
   onStep,
-  currentLine
+  currentLine,
 }) => {
   return (
     <div className="h-full p-4 bg-gray-50">
       <h3 className="text-lg font-medium mb-4">Debug Controls</h3>
-      
+
       <div className="space-y-3">
         {!isDebugging ? (
           <button
@@ -43,7 +43,7 @@ const DebugPanel: React.FC<DebugPanelProps> = ({
             </button>
           </div>
         )}
-        
+
         {currentLine && (
           <div className="mt-4 p-3 bg-blue-100 rounded">
             <p className="text-sm font-medium">Current Line: {currentLine}</p>

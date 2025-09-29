@@ -4,13 +4,13 @@ import mermaid from 'mermaid';
 type VisualizationMode = 'flowchart' | 'datastructure' | 'memory' | 'compare';
 
 interface DataStructureState {
-  arrays?: Array<{name: string, values: unknown[], highlightIndex?: number}>;
+  arrays?: Array<{ name: string; values: unknown[]; highlightIndex?: number }>;
   trees?: unknown[];
 }
 
 interface MemoryState {
-  stack?: Array<{function: string, line: number}>;
-  heap?: Array<{type: string, value: string, id: string}>;
+  stack?: Array<{ function: string; line: number }>;
+  heap?: Array<{ type: string; value: string; id: string }>;
 }
 
 interface FlowchartViewerProps {
@@ -21,21 +21,21 @@ interface FlowchartViewerProps {
   compareMode?: boolean;
 }
 
-const FlowchartViewer: React.FC<FlowchartViewerProps> = ({ 
-  data, 
-  currentLine, 
-  dsState, 
-  memoryState 
+const FlowchartViewer: React.FC<FlowchartViewerProps> = ({
+  data,
+  currentLine,
+  dsState,
+  memoryState,
 }) => {
   const [viewMode, setViewMode] = useState<VisualizationMode>('flowchart');
   const mermaidRef = useRef<HTMLDivElement>(null);
 
   // Initialize Mermaid on component mount
   useEffect(() => {
-    mermaid.initialize({ 
+    mermaid.initialize({
       startOnLoad: true,
       theme: 'default',
-      securityLevel: 'loose'
+      securityLevel: 'loose',
     });
   }, []);
 
@@ -45,7 +45,7 @@ const FlowchartViewer: React.FC<FlowchartViewerProps> = ({
       try {
         mermaidRef.current.innerHTML = '';
         const id = `mermaid-${Date.now()}`;
-        mermaid.render(id, data).then((result) => {
+        mermaid.render(id, data).then(result => {
           if (mermaidRef.current) {
             mermaidRef.current.innerHTML = result.svg;
           }
@@ -67,7 +67,7 @@ const FlowchartViewer: React.FC<FlowchartViewerProps> = ({
         <h3 className="text-lg font-semibold text-blue-800">Code Flow Diagram</h3>
       </div>
       {data ? (
-        <div 
+        <div
           ref={mermaidRef}
           className="w-full min-h-[200px] bg-white rounded-lg p-4 shadow-inner border border-blue-100"
         />
@@ -89,7 +89,10 @@ const FlowchartViewer: React.FC<FlowchartViewerProps> = ({
       {dsState?.arrays && dsState.arrays.length > 0 ? (
         <div className="space-y-6">
           {dsState.arrays.map((array, index) => (
-            <div key={index} className="bg-white rounded-lg p-4 shadow-inner border border-green-100">
+            <div
+              key={index}
+              className="bg-white rounded-lg p-4 shadow-inner border border-green-100"
+            >
               <h5 className="font-medium text-green-700 mb-3 flex items-center">
                 <span className="text-lg mr-2">📊</span>
                 {array.name}
@@ -100,9 +103,10 @@ const FlowchartViewer: React.FC<FlowchartViewerProps> = ({
                     key={idx}
                     className={`
                       px-3 py-2 rounded-lg border-2 transition-all duration-300
-                      ${idx === array.highlightIndex 
-                        ? 'bg-yellow-200 border-yellow-400 shadow-lg transform scale-105' 
-                        : 'bg-gray-50 border-gray-300 hover:bg-gray-100'
+                      ${
+                        idx === array.highlightIndex
+                          ? 'bg-yellow-200 border-yellow-400 shadow-lg transform scale-105'
+                          : 'bg-gray-50 border-gray-300 hover:bg-gray-100'
                       }
                     `}
                   >
@@ -145,7 +149,7 @@ const FlowchartViewer: React.FC<FlowchartViewerProps> = ({
               )) || <p className="text-gray-500 text-sm">Empty stack</p>}
             </div>
           </div>
-          
+
           <div className="bg-white rounded-lg p-4 shadow-inner border border-purple-100">
             <h5 className="font-medium text-purple-700 mb-3 flex items-center">
               <span className="text-lg mr-2">💾</span>
@@ -204,24 +208,29 @@ const FlowchartViewer: React.FC<FlowchartViewerProps> = ({
         <div className="flex flex-wrap gap-2">
           {[
             { mode: 'flowchart' as VisualizationMode, label: '🔄 Flowchart', color: 'blue' },
-            { mode: 'datastructure' as VisualizationMode, label: '🏗️ Data Structures', color: 'green' },
+            {
+              mode: 'datastructure' as VisualizationMode,
+              label: '🏗️ Data Structures',
+              color: 'green',
+            },
             { mode: 'memory' as VisualizationMode, label: '🧠 Memory', color: 'purple' },
-            { mode: 'compare' as VisualizationMode, label: '⚖️ Compare', color: 'orange' }
+            { mode: 'compare' as VisualizationMode, label: '⚖️ Compare', color: 'orange' },
           ].map(({ mode, label, color }) => (
-          <button
-            key={mode}
-            onClick={() => setViewMode(mode)}
-            className={`
+            <button
+              key={mode}
+              onClick={() => setViewMode(mode)}
+              className={`
               px-4 py-2 rounded-lg font-medium text-sm transition-all duration-200
-              ${viewMode === mode 
-                ? `bg-${color}-100 text-${color}-800 border-2 border-${color}-300 shadow-md` 
-                : 'bg-gray-50 text-gray-600 border border-gray-300 hover:bg-gray-100'
+              ${
+                viewMode === mode
+                  ? `bg-${color}-100 text-${color}-800 border-2 border-${color}-300 shadow-md`
+                  : 'bg-gray-50 text-gray-600 border border-gray-300 hover:bg-gray-100'
               }
             `}
-          >
-            {label}
-          </button>
-        ))}
+            >
+              {label}
+            </button>
+          ))}
         </div>
       </div>
     </div>
@@ -245,10 +254,8 @@ const FlowchartViewer: React.FC<FlowchartViewerProps> = ({
   return (
     <div className="h-full flex flex-col">
       {renderModeSelector()}
-      <div className="flex-1 overflow-auto">
-        {renderCurrentView()}
-      </div>
-      
+      <div className="flex-1 overflow-auto">{renderCurrentView()}</div>
+
       {currentLine && (
         <div className="mt-4 p-3 bg-yellow-100 border border-yellow-300 rounded-lg">
           <div className="flex items-center">

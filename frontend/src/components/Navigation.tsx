@@ -11,10 +11,7 @@ const Navigation: React.FC = () => {
               PyFlow
             </Link>
             <div className="flex space-x-4">
-              <Link
-                to="/"
-                className="hover:bg-blue-700 px-3 py-2 rounded transition-colors"
-              >
+              <Link to="/" className="hover:bg-blue-700 px-3 py-2 rounded transition-colors">
                 Code Editor
               </Link>
               <Link

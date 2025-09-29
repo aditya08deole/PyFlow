@@ -14,7 +14,7 @@ const AIAssistant: React.FC<AIAssistantProps> = ({ code }) => {
       const response = await fetch('/api/ai-suggestions', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ code })
+        body: JSON.stringify({ code }),
       });
       const data = await response.json();
       setSuggestions(data.suggestions || []);
@@ -37,7 +37,7 @@ const AIAssistant: React.FC<AIAssistantProps> = ({ code }) => {
           {isLoading ? 'Loading...' : 'Get Help'}
         </button>
       </div>
-      
+
       <div className="space-y-3">
         {suggestions.length === 0 ? (
           <p className="text-gray-500 text-sm">

@@ -18,18 +18,18 @@ const debugSlice = createSlice({
   name: 'debug',
   initialState,
   reducers: {
-    startDebugging: (state) => {
+    startDebugging: state => {
       state.isDebugging = true;
       state.currentLine = 1;
       state.executionHistory = [];
     },
-    stopDebugging: (state) => {
+    stopDebugging: state => {
       state.isDebugging = false;
       state.currentLine = null;
       state.variables = {};
       state.executionHistory = [];
     },
-    stepForward: (state) => {
+    stepForward: state => {
       if (state.currentLine !== null) {
         state.executionHistory.push(state.currentLine);
         state.currentLine += 1;
@@ -44,12 +44,7 @@ const debugSlice = createSlice({
   },
 });
 
-export const {
-  startDebugging,
-  stopDebugging,
-  stepForward,
-  setCurrentLine,
-  updateVariables,
-} = debugSlice.actions;
+export const { startDebugging, stopDebugging, stepForward, setCurrentLine, updateVariables } =
+  debugSlice.actions;
 
 export default debugSlice.reducer;
