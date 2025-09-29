@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from 'react';
 import MonacoEditor from '../components/MonacoEditor';
-// Make sure the file exists at the specified path, or update the path if necessary
 import FlowchartViewer from '../components/FlowchartViewer';
 import DebugPanel from '../components/DebugPanel';
 import VariablePanel from '../components/VariablePanel';
