@@ -1,17 +1,65 @@
 import React from 'react';
 
+interface ArrayData {
+  name: string;
+  values: unknown[];
+  highlightIndex?: number;
+  compareIndices?: number[];
+  operation?: string;
+}
+
+interface LinkedListNode {
+  value: string | number;
+  next?: LinkedListNode;
+  id?: string | number;
+}
+
+interface LinkedList {
+  name: string;
+  nodes: LinkedListNode[];
+  highlightIndex?: number;
+  operation?: string;
+}
+
+interface Stack {
+  name: string;
+  items: (string | number)[];
+  highlightTop?: boolean;
+  operation?: string;
+}
+
+interface TreeRoot {
+  value: string | number;
+}
+
+interface Tree {
+  name: string;
+  root?: TreeRoot;
+  nodeCount?: number;
+  operation?: string;
+}
+
+interface Metrics {
+  comparisons?: number;
+  swaps?: number;
+  timeComplexity?: string;
+  spaceComplexity?: string;
+}
+
 interface DataStructureViewerProps {
-  dsState: any;
-  highlightedOperation?: string;
-  animationStep?: number;
+  dsState: {
+    arrays?: ArrayData[];
+    stacks?: Stack[];
+    trees?: Tree[];
+    linkedLists?: LinkedList[];
+    metrics?: Metrics;
+  };
 }
 
 const DataStructureViewer: React.FC<DataStructureViewerProps> = ({
-  dsState,
-  highlightedOperation,
-  animationStep = 0
+  dsState
 }) => {
-  const renderArray = (arr: any) => (
+  const renderArray = (arr: ArrayData) => (
     <div className="bg-white p-4 rounded border shadow-sm">
       <div className="flex items-center justify-between mb-3">
         <h4 className="font-medium text-gray-800">{arr.name || 'Array'}</h4>
@@ -19,7 +67,7 @@ const DataStructureViewer: React.FC<DataStructureViewerProps> = ({
       </div>
       
       <div className="flex space-x-1 mb-2">
-        {arr.values.map((val: any, i: number) => (
+        {arr.values.map((val: unknown, i: number) => (
           <div 
             key={i}
             className={`w-12 h-12 border-2 flex items-center justify-center text-sm font-medium transition-all duration-300 ${
@@ -31,14 +79,14 @@ const DataStructureViewer: React.FC<DataStructureViewerProps> = ({
             }`}
             title={`Index ${i}: ${val}`}
           >
-            {val}
+            {String(val)}
           </div>
         ))}
       </div>
       
       {/* Index labels */}
       <div className="flex space-x-1">
-        {arr.values.map((_: any, i: number) => (
+        {arr.values.map((_: unknown, i: number) => (
           <div key={i} className="w-12 text-center text-xs text-gray-500">
             {i}
           </div>
@@ -54,7 +102,7 @@ const DataStructureViewer: React.FC<DataStructureViewerProps> = ({
     </div>
   );
 
-  const renderLinkedList = (list: any) => (
+  const renderLinkedList = (list: LinkedList) => (
     <div className="bg-white p-4 rounded border shadow-sm">
       <div className="flex items-center justify-between mb-3">
         <h4 className="font-medium text-gray-800">{list.name || 'Linked List'}</h4>
@@ -62,7 +110,7 @@ const DataStructureViewer: React.FC<DataStructureViewerProps> = ({
       </div>
       
       <div className="flex items-center space-x-2 overflow-x-auto pb-2">
-        {list.nodes.map((node: any, i: number) => (
+        {list.nodes.map((node: LinkedListNode, i: number) => (
           <React.Fragment key={i}>
             <div 
               className={`flex-shrink-0 w-16 h-16 border-2 rounded-lg flex flex-col items-center justify-center transition-all duration-300 ${
@@ -92,7 +140,7 @@ const DataStructureViewer: React.FC<DataStructureViewerProps> = ({
     </div>
   );
 
-  const renderStack = (stack: any) => (
+  const renderStack = (stack: Stack) => (
     <div className="bg-white p-4 rounded border shadow-sm">
       <div className="flex items-center justify-between mb-3">
         <h4 className="font-medium text-gray-800">{stack.name || 'Stack'}</h4>
@@ -100,7 +148,7 @@ const DataStructureViewer: React.FC<DataStructureViewerProps> = ({
       </div>
       
       <div className="flex flex-col-reverse space-y-reverse space-y-1 min-h-32">
-        {stack.items.map((item: any, i: number) => (
+        {stack.items.map((item: unknown, i: number) => (
           <div 
             key={i}
             className={`w-full h-10 border-2 flex items-center justify-center text-sm font-medium transition-all duration-300 ${
@@ -109,7 +157,7 @@ const DataStructureViewer: React.FC<DataStructureViewerProps> = ({
                 : 'border-gray-300 bg-white hover:bg-gray-50'
             }`}
           >
-            {item}
+            {String(item)}
           </div>
         ))}
         {stack.items.length === 0 && (
@@ -131,7 +179,7 @@ const DataStructureViewer: React.FC<DataStructureViewerProps> = ({
     </div>
   );
 
-  const renderBinaryTree = (tree: any) => (
+  const renderBinaryTree = (tree: Tree) => (
     <div className="bg-white p-4 rounded border shadow-sm">
       <div className="flex items-center justify-between mb-3">
         <h4 className="font-medium text-gray-800">{tree.name || 'Binary Tree'}</h4>
@@ -182,28 +230,28 @@ const DataStructureViewer: React.FC<DataStructureViewerProps> = ({
   return (
     <div className="space-y-6 p-4">
       {/* Arrays */}
-      {dsState.arrays?.map((arr: any, idx: number) => (
+      {dsState.arrays?.map((arr: ArrayData, idx: number) => (
         <div key={`array-${idx}`}>
           {renderArray(arr)}
         </div>
       ))}
       
       {/* Linked Lists */}
-      {dsState.linkedLists?.map((list: any, idx: number) => (
+      {dsState.linkedLists?.map((list: LinkedList, idx: number) => (
         <div key={`list-${idx}`}>
           {renderLinkedList(list)}
         </div>
       ))}
       
       {/* Stacks */}
-      {dsState.stacks?.map((stack: any, idx: number) => (
+      {dsState.stacks?.map((stack: Stack, idx: number) => (
         <div key={`stack-${idx}`}>
           {renderStack(stack)}
         </div>
       ))}
       
       {/* Binary Trees */}
-      {dsState.trees?.map((tree: any, idx: number) => (
+      {dsState.trees?.map((tree: Tree, idx: number) => (
         <div key={`tree-${idx}`}>
           {renderBinaryTree(tree)}
         </div>

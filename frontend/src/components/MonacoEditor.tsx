@@ -3,13 +3,11 @@ import React from 'react';
 interface MonacoEditorProps {
   value: string;
   onChange: (value: string) => void;
-  currentLine?: number | null;
 }
 
 const MonacoEditor: React.FC<MonacoEditorProps> = ({ 
   value, 
-  onChange, 
-  currentLine 
+  onChange 
 }) => {
   return (
     <div className="w-full h-full">

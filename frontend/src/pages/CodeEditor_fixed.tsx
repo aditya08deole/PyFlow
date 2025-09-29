@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from 'react';
 import MonacoEditor from '../components/MonacoEditor';
-// Make sure the file exists at the specified path, or update the path if necessary
 import FlowchartViewer from '../components/FlowchartViewer';
 import DebugPanel from '../components/DebugPanel';
 import VariablePanel from '../components/VariablePanel';
@@ -51,7 +50,7 @@ print("Stack operations complete!")`);
   const [variables, setVariables] = useState<Record<string, unknown>>({});
   
   // Sample data for visualization demo
-  const [sampleDsState] = useState({
+  const sampleDsState = {
     arrays: [
       {
         name: 'my_array',
@@ -64,9 +63,9 @@ print("Stack operations complete!")`);
         highlightIndex: 2
       }
     ]
-  });
+  };
   
-  const [sampleMemoryState] = useState({
+  const sampleMemoryState = {
     stack: [
       { function: 'bubble_sort', line: 8 },
       { function: 'main', line: 15 }
@@ -76,7 +75,7 @@ print("Stack operations complete!")`);
       { type: 'int', value: '64', id: '0x7f8b90' },
       { type: 'str', value: '"Original array:"', id: '0x7f8b94' }
     ]
-  });
+  };
 
   // Generate flowchart when code changes
   useEffect(() => {

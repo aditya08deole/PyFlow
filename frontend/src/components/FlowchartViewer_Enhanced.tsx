@@ -25,8 +25,7 @@ const FlowchartViewer: React.FC<FlowchartViewerProps> = ({
   data, 
   currentLine, 
   dsState, 
-  memoryState,
-  compareMode: _compareMode 
+  memoryState 
 }) => {
   const [viewMode, setViewMode] = useState<VisualizationMode>('flowchart');
   const mermaidRef = useRef<HTMLDivElement>(null);
@@ -201,20 +200,21 @@ const FlowchartViewer: React.FC<FlowchartViewerProps> = ({
 
   const renderModeSelector = () => (
     <div className="bg-white rounded-lg p-3 shadow-md border border-gray-200 mb-4">
-      <div className="flex flex-wrap gap-2">
-        {[
-          { mode: 'flowchart' as VisualizationMode, label: '🔄 Flowchart' },
-          { mode: 'datastructure' as VisualizationMode, label: '🏗️ Data Structures' },
-          { mode: 'memory' as VisualizationMode, label: '🧠 Memory' },
-          { mode: 'compare' as VisualizationMode, label: '⚖️ Compare' }
-        ].map(({ mode, label }) => (
+      <div className="flex justify-between items-center mb-3">
+        <div className="flex flex-wrap gap-2">
+          {[
+            { mode: 'flowchart' as VisualizationMode, label: '🔄 Flowchart', color: 'blue' },
+            { mode: 'datastructure' as VisualizationMode, label: '🏗️ Data Structures', color: 'green' },
+            { mode: 'memory' as VisualizationMode, label: '🧠 Memory', color: 'purple' },
+            { mode: 'compare' as VisualizationMode, label: '⚖️ Compare', color: 'orange' }
+          ].map(({ mode, label, color }) => (
           <button
             key={mode}
             onClick={() => setViewMode(mode)}
             className={`
               px-4 py-2 rounded-lg font-medium text-sm transition-all duration-200
               ${viewMode === mode 
-                ? 'bg-blue-100 text-blue-800 border-2 border-blue-300 shadow-md' 
+                ? `bg-${color}-100 text-${color}-800 border-2 border-${color}-300 shadow-md` 
                 : 'bg-gray-50 text-gray-600 border border-gray-300 hover:bg-gray-100'
               }
             `}
@@ -222,6 +222,7 @@ const FlowchartViewer: React.FC<FlowchartViewerProps> = ({
             {label}
           </button>
         ))}
+        </div>
       </div>
     </div>
   );

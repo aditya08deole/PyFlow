@@ -1,7 +1,7 @@
 import React from 'react';
 
 interface VariablePanelProps {
-  variables: Record<string, any>;
+  variables: Record<string, unknown>;
 }
 
 const VariablePanel: React.FC<VariablePanelProps> = ({ variables }) => {

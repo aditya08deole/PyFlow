@@ -3,7 +3,7 @@ import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 interface DebugState {
   isDebugging: boolean;
   currentLine: number | null;
-  variables: Record<string, any>;
+  variables: Record<string, unknown>;
   executionHistory: number[];
 }
 
@@ -38,7 +38,7 @@ const debugSlice = createSlice({
     setCurrentLine: (state, action: PayloadAction<number>) => {
       state.currentLine = action.payload;
     },
-    updateVariables: (state, action: PayloadAction<Record<string, any>>) => {
+    updateVariables: (state, action: PayloadAction<Record<string, unknown>>) => {
       state.variables = action.payload;
     },
   },
