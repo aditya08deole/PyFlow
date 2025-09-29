@@ -6,43 +6,54 @@ import VariablePanel from '../components/VariablePanel';
 import AIAssistant from '../components/AIAssistant';
 
 const CodeEditor: React.FC = () => {
-  const [code, setCode] = useState(`# 🐍 Welcome to PyFlow Enhanced! 
-# Write your Python code here and see it visualized in real-time
+  const [code, setCode] = useState(`# � Welcome to PyFlow Enhanced v2.0!
+# Advanced Visual Python Coding Assistant with AI-powered insights
 
-# Example: Array operations and algorithms
-def bubble_sort(arr):
-    """Bubble sort with step-by-step visualization"""
-    n = len(arr)
-    for i in range(n):
-        for j in range(0, n - i - 1):
-            if arr[j] > arr[j + 1]:
-                # Swap elements
-                arr[j], arr[j + 1] = arr[j + 1], arr[j]
-    return arr
+def factorial(n):
+    """Calculate factorial using recursion with performance monitoring"""
+    if n <= 1:
+        return 1
+    return n * factorial(n - 1)
 
-# Initialize array
-my_array = [64, 34, 25, 12, 22, 11, 90]
-print("Original array:", my_array)
+def fibonacci(n):
+    """Generate fibonacci sequence with step-by-step visualization"""
+    if n <= 0:
+        return []
+    elif n == 1:
+        return [0]
+    elif n == 2:
+        return [0, 1]
+    
+    fib_sequence = [0, 1]
+    for i in range(2, n):
+        next_val = fib_sequence[i-1] + fib_sequence[i-2]
+        fib_sequence.append(next_val)
+    return fib_sequence
 
-# Check if array is sorted
-if len(my_array) > 1:
-    sorted_array = bubble_sort(my_array.copy())
-    print("Sorted array:", sorted_array)
-else:
-    print("Array is too small to sort")
+# Enhanced examples for visualization
+try:
+    # Test factorial function
+    num = 5
+    result = factorial(num)
+    print(f"Factorial of {num} is: {result}")
+    
+    # Generate fibonacci sequence
+    fib_count = 8
+    fib_numbers = fibonacci(fib_count)
+    print(f"First {fib_count} Fibonacci numbers: {fib_numbers}")
+    
+    # Array manipulation with performance tracking
+    numbers = [64, 34, 25, 12, 22, 11, 90, 88, 76, 50, 42]
+    print(f"Original array: {numbers}")
+    
+    # Enhanced sorting with complexity analysis
+    sorted_nums = sorted(numbers)
+    print(f"Sorted array: {sorted_nums}")
+    
+except Exception as e:
+    print(f"Error occurred: {e}")
 
-# Stack operations example
-stack = []
-for item in [10, 20, 30, 40]:
-    stack.append(item)
-    print(f"Pushed {item}, Stack: {stack}")
-
-# Pop elements
-while stack:
-    popped = stack.pop()
-    print(f"Popped {popped}, Stack: {stack}")
-
-print("Stack operations complete!")`);
+print("✅ Enhanced PyFlow demonstration complete!")`);
 
   const [flowchartData, setFlowchartData] = useState<string>('');
   const [isDebugging, setIsDebugging] = useState(false);
@@ -86,7 +97,7 @@ print("Stack operations complete!")`);
   const generateFlowchart = async (pythonCode: string) => {
     try {
       // API call to backend for AST parsing and flowchart generation
-      const response = await fetch('/api/generate-flowchart', {
+      const response = await fetch('http://localhost:8002/api/generate-flowchart', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

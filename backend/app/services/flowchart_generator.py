@@ -1,30 +1,46 @@
 import ast
-from typing import Any, Dict, List, Tuple
+import time
+from typing import Any, Dict, List, Tuple, Optional
 
 
 class FlowchartGenerator:
     """
-    Generates Mermaid.js flowchart from Python AST
+    Enhanced Mermaid.js flowchart generator with performance analysis
     """
 
     def __init__(self):
         self.node_id = 0
         self.nodes = {}
         self.edges = []
+        self.performance_metrics = {
+            'execution_time': 0,
+            'memory_usage': 0,
+            'complexity': 'O(1)',
+            'operations': 0
+        }
+        self.code_insights = []
+        self.variables_used = set()
+        self.functions_defined = []
 
     def generate_from_code(self, code: str) -> Tuple[str, Dict[str, Any]]:
         """
-        Generate flowchart from Python code
+        Generate enhanced flowchart with performance metrics and insights
 
         Args:
             code: Python source code string
 
         Returns:
-            Tuple of (mermaid_code, nodes_dict)
+            Tuple of (mermaid_code, analysis_data)
         """
+        start_time = time.time()
+        
         try:
             tree = ast.parse(code)
             self.reset()
+            
+            # Analyze code complexity and gather insights
+            self._analyze_code_complexity(tree)
+            self._gather_code_insights(tree, code)
 
             # Process the AST
             start_node = self.create_node("START", "start")
@@ -36,10 +52,22 @@ class FlowchartGenerator:
             end_node = self.create_node("END", "end")
             self.add_edge(current_node, end_node)
 
+            # Calculate execution time
+            self.performance_metrics['execution_time'] = round((time.time() - start_time) * 1000, 2)
+            
             # Generate Mermaid syntax
             mermaid_code = self.generate_mermaid()
+            
+            # Prepare comprehensive analysis data
+            analysis_data = {
+                'nodes': self.nodes,
+                'performance_metrics': self.performance_metrics,
+                'code_insights': self.code_insights,
+                'variables': list(self.variables_used),
+                'functions': self.functions_defined
+            }
 
-            return mermaid_code, self.nodes
+            return mermaid_code, analysis_data
 
         except Exception as e:
             raise Exception(f"Failed to generate flowchart: {str(e)}")
@@ -49,6 +77,63 @@ class FlowchartGenerator:
         self.node_id = 0
         self.nodes = {}
         self.edges = []
+        self.performance_metrics = {
+            'execution_time': 0,
+            'memory_usage': 0,
+            'complexity': 'O(1)',
+            'operations': 0
+        }
+        self.code_insights = []
+        self.variables_used = set()
+        self.functions_defined = []
+        
+    def _analyze_code_complexity(self, tree: ast.AST) -> None:
+        """Analyze code complexity and estimate Big-O"""
+        complexity_score = 0
+        
+        for node in ast.walk(tree):
+            if isinstance(node, ast.For):
+                complexity_score += 1
+            elif isinstance(node, ast.While):
+                complexity_score += 1
+            elif isinstance(node, ast.If):
+                complexity_score += 0.5
+                
+        # Estimate complexity
+        if complexity_score == 0:
+            self.performance_metrics['complexity'] = 'O(1)'
+        elif complexity_score <= 1:
+            self.performance_metrics['complexity'] = 'O(n)'
+        elif complexity_score <= 2:
+            self.performance_metrics['complexity'] = 'O(n²)'
+        else:
+            self.performance_metrics['complexity'] = 'O(n³+)'
+            
+    def _gather_code_insights(self, tree: ast.AST, code: str) -> None:
+        """Gather insights about code quality and patterns"""
+        lines = code.split('\n')
+        
+        # Count operations
+        operations = 0
+        for node in ast.walk(tree):
+            if isinstance(node, (ast.Assign, ast.Call, ast.Return)):
+                operations += 1
+                
+        self.performance_metrics['operations'] = operations
+        
+        # Analyze patterns and suggest improvements
+        if len(lines) > 50:
+            self.code_insights.append("Consider breaking down large functions")
+            
+        # Check for common patterns
+        has_docstrings = any('"""' in line or "'''" in line for line in lines)
+        if not has_docstrings:
+            self.code_insights.append("Add docstrings for better documentation")
+            
+        # Check for error handling
+        has_try_except = any('try:' in line for line in lines)
+        if not has_try_except and len(lines) > 10:
+            self.code_insights.append("Consider adding error handling")
 
     def create_node(
         self, label: str, node_type: str = "process", line_no: int = None
@@ -78,6 +163,8 @@ class FlowchartGenerator:
             targets = [
                 target.id for target in stmt.targets if isinstance(target, ast.Name)
             ]
+            # Track variables
+            self.variables_used.update(targets)
             label = f"Assign: {', '.join(targets)}"
             node = self.create_node(label, "process", stmt.lineno)
             self.add_edge(current_node, node)
@@ -152,6 +239,12 @@ class FlowchartGenerator:
 
         elif isinstance(stmt, ast.FunctionDef):
             # Function definition
+            func_info = {
+                'name': stmt.name,
+                'args': [arg.arg for arg in stmt.args.args],
+                'line': stmt.lineno
+            }
+            self.functions_defined.append(func_info)
             func_node = self.create_node(
                 f"Function: {stmt.name}", "process", stmt.lineno
             )

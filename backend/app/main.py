@@ -1,7 +1,7 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
-from app.api.routes import ai_assistant, debug, ds_analysis, flowchart
+from app.api.routes import ai_assistant, debug, ds_analysis, flowchart, websocket
 
 app = FastAPI(
     title="PyFlow Enhanced API",
@@ -14,7 +14,9 @@ app.add_middleware(
     CORSMiddleware,
     allow_origins=[
         "http://localhost:3000",
-        "http://localhost:3001",
+        "http://localhost:3001", 
+        "http://localhost:3002",
+        "*"  # Allow all origins for development
     ],  # React dev server
     allow_credentials=True,
     allow_methods=["*"],
@@ -26,6 +28,7 @@ app.include_router(flowchart.router, prefix="/api", tags=["flowchart"])
 app.include_router(debug.router, prefix="/api", tags=["debug"])
 app.include_router(ai_assistant.router, prefix="/api", tags=["ai"])
 app.include_router(ds_analysis.router, prefix="/api", tags=["datastructures"])
+app.include_router(websocket.router, prefix="/api", tags=["collaboration"])
 
 
 @app.get("/")
@@ -41,4 +44,4 @@ async def health_check():
 if __name__ == "__main__":
     import uvicorn
 
-    uvicorn.run(app, host="0.0.0.0", port=8000)
+    uvicorn.run(app, host="0.0.0.0", port=8001)
