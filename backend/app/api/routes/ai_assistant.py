@@ -53,7 +53,7 @@ async def explain_code(request: dict):
         code = request.get("code", "")
 
         # Mock explanation - replace with actual AI service
-        num_lines = code.count('\n') + 1
+        num_lines = code.count("\n") + 1
         explanation = (
             f"This code appears to define functions and perform operations. "
             f"It contains {code.count('def')} function definitions and "

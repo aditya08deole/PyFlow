@@ -1,3 +1,5 @@
+export {};
+
 describe('MonacoEditor Component', () => {
   test('component module can be imported', () => {
     // Simple test to verify the component can be imported
